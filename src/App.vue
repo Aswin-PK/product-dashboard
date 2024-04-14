@@ -57,10 +57,17 @@ export default {
 }
 .el-aside{
   height: calc(100svh - 60px);  /* 60px is the default height of el-header component */
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
 
 .el-main {
-  height: calc(100svh - 120px)
+  height: calc(100svh - 120px);
+  background-color: #ebeff6;
+}
+
+.el-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

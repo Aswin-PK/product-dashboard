@@ -1,11 +1,11 @@
 <template>
     <el-menu default-active="0" class="el-menu-vertical-demo">
         <el-menu-item index="0" @click="handleProduct('')">
-            <i class="el-icon-menu"></i>
+            <i class="el-icon-goods"></i>
             <span>All Products</span>
         </el-menu-item>
         <el-menu-item v-for="(category, index) in categories" :index="index+1" :key="index" @click="handleProduct(category)">
-            <!-- <i class="el-icon-menu"></i> -->
+            <i class="el-icon-goods"></i>
             <span>{{ category }}</span>
         </el-menu-item>
 </el-menu>
@@ -29,6 +29,7 @@ export default {
 
 <style>
 .el-menu-item {
-    text-align: end;
+    text-align: start;
+    /* font-weight: 500; */
 }
 </style>
