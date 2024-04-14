@@ -57,7 +57,23 @@ export const store = new Vuex.Store({
             commit('SET_TABLE_COLUMN_HEADERS')
         },
 
-        
+        async searchProducts({commit, state}, searchInput) {
+            if(state.selectedCategory === ''){
+                try {
+                    const response = await axios.get(`https://dummyjson.com/products/search?q=${searchInput}&limit=${state.limit}`)
+                    commit('SET_PRODUCTS', response.data.products)
+                }
+                catch(error) {
+                    console.log("Error while searching...")
+                }
+            }
+            else {
+                let filteredProducts = state.products.filter(product => {
+                    return product.title.toLowerCase().includes(searchInput.toLowerCase())
+                })
+                commit('SET_PRODUCTS', filteredProducts)
+            }
+        }
     },
     getters: {
         getAllProducts(state) {
