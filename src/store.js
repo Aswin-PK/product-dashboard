@@ -9,9 +9,11 @@ export const store = new Vuex.Store({
         products: [],
         categories: [],
         tableColumnHeaders: [],
-        selectedCategory: '',
+        selectedCategory: [],
         totalItems: null,
         limit: 10,
+        loading: false,
+        singleProduct: null,
     },
     mutations: {
         SET_PRODUCTS(state, productItems) {
@@ -27,23 +29,48 @@ export const store = new Vuex.Store({
         SET_TOTAL(state, total) {
             state.totalItems = total
         },
+        SET_LIMIT(state, limit) {
+            state.limit = limit
+        },
+        SET_SINGLE_PRODUCT(state, data) {
+            state.singleProduct = data
+        },
     },
     actions: {
-        async setProducts({commit, state}, {category=state.selectedCategory, skip=0}) {
-            state.selectedCategory = category
-            const skipCount = (state.selectedCategory == '') ? ( (skip == 0) ? 0 : (skip-1)*state.limit ) : 0
+        async fetchProducts({commit, state}, {category=state.selectedCategory, limit=state.limit, skip=0}) {
 
+            state.loading = true;
+
+            state.selectedCategory = category
+            const skipCount = (state.selectedCategory.length === 0) ? ( (skip == 0) ? 0 : (skip-1)*limit ) : 0
+            
+            let response, products = [], total = 0;
             try {
-                const response = await axios.get(`https://dummyjson.com/products${state.selectedCategory ? '/category/' + state.selectedCategory : ''}?limit=${state.limit}&skip=${skipCount}`);
-                commit('SET_TOTAL', response.data.total)
-                commit('SET_PRODUCTS', response.data.products)
+                if(state.selectedCategory.length !== 0) {
+                    await Promise.all(state.selectedCategory.map(async category => {
+                        if(category) {
+                            response = await axios.get(`https://dummyjson.com/products/category/${category}?limit=${limit}&skip=${skipCount}`)
+                            total += response.data.total
+                            products.push(...response.data.products)
+                        }
+                    }));
+                }
+                else {
+                    response = await axios.get(`https://dummyjson.com/products?limit=${limit}&skip=${skipCount}`)
+                    products = response.data.products;
+                    total += response.data.total
+                }
+                state.loading = false;
+
+                commit('SET_TOTAL', total)
+                commit('SET_PRODUCTS', products)
                 this.dispatch('setTableColumnHeaders')
             }
             catch(error) {
                 console.log("Something went wrong...", error)
             }
         },
-        async setCategories({commit}) {
+        async fetchCategories({commit}) {
             try {
                 const response = await axios.get('https://dummyjson.com/products/categories');
                 commit('SET_CATEGORIES', response.data)
@@ -58,7 +85,7 @@ export const store = new Vuex.Store({
         },
 
         async searchProducts({commit, state}, searchInput) {
-            if(state.selectedCategory === ''){
+            if(state.selectedCategory.length !== 0) {
                 try {
                     const response = await axios.get(`https://dummyjson.com/products/search?q=${searchInput}&limit=${state.limit}`)
                     commit('SET_PRODUCTS', response.data.products)
@@ -73,7 +100,25 @@ export const store = new Vuex.Store({
                 })
                 commit('SET_PRODUCTS', filteredProducts)
             }
+        },
+
+        setLimit({commit}, limit) {
+            commit('SET_LIMIT', limit)
+        },
+
+        async fetchSingleProduct({commit, state}, id) {
+            state.singleProduct = null
+            state.loading = true
+            try {
+                const response = await axios.get('https://dummyjson.com/products/'+id)
+                commit('SET_SINGLE_PRODUCT', response.data)
+            }
+            catch(error) {
+                console.log('Something went wrong,', error)
+            }
+            state.loading = false
         }
+
     },
     getters: {
         getAllProducts(state) {
@@ -87,6 +132,12 @@ export const store = new Vuex.Store({
         },
         getDisplayLimit(state) {
             return {limit: state.limit, total: state.totalItems};
+        },
+        getLoading(state) {
+            return state.loading
+        },
+        getSingleProduct(state) {
+            return state.singleProduct
         },
     }
 })

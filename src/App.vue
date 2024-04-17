@@ -11,7 +11,7 @@
 
       <el-container>
         <el-main>
-          <HomePage />
+          <router-view></router-view>
         </el-main>
 
         <el-footer>
@@ -25,22 +25,20 @@
 </template>
 
 <script>
-import NavBar from './components/Navbar.vue'
-import SideBar from './components/Sidebar.vue'
-import HomePage from './pages/Home.vue'
-import FooterContainer from './components/Footer.vue'
+import NavBar from '@/components/Navbar.vue'
+import SideBar from '@/components/Sidebar.vue'
+import FooterContainer from '@/components/Footer.vue'
 
 export default {
   name: 'App',
   components: {
     NavBar,
     SideBar,
-    HomePage,
     FooterContainer,
   },
-  created() {
-    this.$store.dispatch('setProducts', {})
-    this.$store.dispatch('setCategories')
+  mounted() {
+    this.$store.dispatch('fetchCategories')
+    this.$store.dispatch('fetchProducts', {})
   }
 }
 </script>
@@ -65,9 +63,4 @@ export default {
   background-color: #ebeff6;
 }
 
-.el-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 </style>

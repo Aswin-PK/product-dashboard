@@ -1,9 +1,12 @@
 <template>
-    <TableContainer />
+    <el-contaiemr>
+        <TableContainer />
+        
+    </el-contaiemr>
 </template>
   
 <script>
-import TableContainer from '../components/Table.vue'
+import TableContainer from '@/components/Table.vue'
   
 export default {
     name: 'HomePage',

@@ -5,16 +5,16 @@
             </el-input>
         </span>
         
-        <el-table :data="tableData" stripe height="510" style="width: 100%;" class="custom-table" @row-click="handleClick">
+        <el-table v-loading="isLoading" :data="tableData" stripe height="510" style="width: 100%;" class="custom-table" @row-click="handleClick">
             <!-- For the image column -->
-            <el-table-column label="Image" width="180">
+            <el-table-column label="Image">
                 <template slot-scope="scope">
-                    <img :src="scope.row.thumbnail" :alt="scope.row.title+' Image'" style="width: 100px; height: 100px;" lazy>
+                    <img :src="scope.row.thumbnail" :alt="scope.row.title+' Image'" style="width: 120px; height: 100px; object-fit: cover;" lazy>
                 </template>
             </el-table-column>
 
             <div v-for="(field, index) in tableHeaders" :key="index">
-                <el-table-column v-if="!['discountPercentage','thumbnail', 'images'].includes(field)" :prop="field" :label="field" fit>
+                <el-table-column v-if="!['id', 'discountPercentage','thumbnail', 'images'].includes(field)" :prop="field" :label="field" fit>
                 </el-table-column>
             </div>
         </el-table>
@@ -37,6 +37,9 @@ export default {
         tableData() {
             return this.$store.getters.getAllProducts;
         },
+        isLoading() {
+            return this.$store.getters.getLoading;
+        }
     },
     watch: {
         input(newValue) {
@@ -50,18 +53,20 @@ export default {
     methods: {
         fetchProducts(searchValue) {
             if(searchValue === '')
-                this.$store.dispatch('setProducts', {})
+                this.$store.dispatch('fetchProducts', {})
             else 
                 this.$store.dispatch('searchProducts', searchValue)
         },
         handleClick(value) {
             console.log(value)
+            this.$store.dispatch('fetchSingleProduct', value.id)
+            this.$router.push({ path: `/product/${value.id}` })
         }
     }
 }
 </script>
 
-<style>
+<style scoped>
 .custom-table.el-table--fit {
     border-radius: 0.8em;
 }
