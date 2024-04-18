@@ -5,18 +5,22 @@
     </el-header>
 
     <el-container>
-      <el-aside width="200px">
+      <el-aside width="150px">
         <SideBar />
       </el-aside>
 
-      <el-container>
+      <el-container class="main-container">
+
+        <!-- <el-breadcrumb separator-class="el-icon-arrow-right">
+          <el-breadcrumb-item :to="{ path: '/' }">homepage</el-breadcrumb-item>
+          <el-breadcrumb-item>promotion management</el-breadcrumb-item>
+          <el-breadcrumb-item>promotion list</el-breadcrumb-item>
+          <el-breadcrumb-item>promotion detail</el-breadcrumb-item>
+        </el-breadcrumb> -->
+
         <el-main>
           <router-view></router-view>
         </el-main>
-
-        <el-footer>
-          <FooterContainer />
-        </el-footer>
       </el-container>
 
     </el-container>
@@ -27,18 +31,15 @@
 <script>
 import NavBar from '@/components/Navbar.vue'
 import SideBar from '@/components/Sidebar.vue'
-import FooterContainer from '@/components/Footer.vue'
 
 export default {
   name: 'App',
   components: {
     NavBar,
     SideBar,
-    FooterContainer,
   },
   mounted() {
     this.$store.dispatch('fetchCategories')
-    this.$store.dispatch('fetchProducts', {})
   }
 }
 </script>
@@ -59,7 +60,7 @@ export default {
 }
 
 .el-main {
-  height: calc(100svh - 120px);
+  height: calc(100svh - 60px);
   background-color: #ebeff6;
 }
 
