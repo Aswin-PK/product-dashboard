@@ -9,10 +9,8 @@
             <span>Out of {{ displayItems.total }}</span>
         </span>
 
-        <el-pagination background layout="prev, pager, next" :total="displayItems.total" @current-change="handleMove">
+        <el-pagination background layout="prev, pager, next" :total="(displayItems.total/displayItems.limit)*10" @current-change="handleMove">
         </el-pagination>
-
-        <span></span>
     </el-container>
 </template>
 
@@ -33,7 +31,9 @@ export default {
         defaultLimit() {
             return (this.displayItems.limit < this.displayItems.total) ? this.displayItems.limit : this.displayItems.total
         },
-
+        total_pages() {
+            return (this.displayItems.total/this.selectedLimit)*10
+        }
     },
     watch: {
         'displayItems.total': function(oldValue, newValue) {
@@ -48,7 +48,7 @@ export default {
                 if(this.defaultLimit !== totalItems)
                     this.limitOptions.push(totalItems)
             }
-        }
+        },
     },
     methods: {
         handleMove(val) {
@@ -65,6 +65,7 @@ export default {
 
 <style scoped>
 .el-container {
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: space-between;

@@ -1,44 +1,30 @@
 <template>
     <el-menu default-active="0" class="el-menu-vertical-demo">
-        <el-menu-item index="0" @click="handleAllProduct">
-            <i class="el-icon-goods"></i>
-            <span>All Products</span>
-        </el-menu-item>
-        <el-checkbox-group v-model="checkList" @change="handleCategorySelect"> 
-            <el-menu-item v-for="(category, index) in categories" :index="index+1" :key="index">
-                <el-checkbox :label="category"></el-checkbox>
+        <router-link to="/">
+            <el-menu-item index="0">
+                <i class="el-icon-goods"></i>
+                <span>All Products</span>
             </el-menu-item>
-        </el-checkbox-group>
-</el-menu>
+        </router-link>
+        <router-link to="/categories">
+            <el-menu-item index="1">
+                <i class="el-icon-tickets"></i>
+                <span>Categories</span>
+            </el-menu-item>
+        </router-link>
+    </el-menu>
 </template>
 
 <script>
 export default {
     name: 'SideBar',
-    data() {
-        return {
-            checkList: [],
-        }
-    },
-    computed: {
-        categories() {
-            return this.$store.getters.getAllCategories;
-        },
-    },
-    methods: {
-        handleCategorySelect() {
-            this.$store.dispatch('fetchProducts', {category: this.checkList})
-        },
-
-        handleAllProduct() {
-            this.checkList = [];
-            this.handleCategorySelect();
-        },
-    }
 }
 </script>
 
 <style scoped>
+.el-menu {
+    margin-top: 1em;
+}
 .el-menu-item {
     text-align: start;
 }

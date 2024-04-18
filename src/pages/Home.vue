@@ -1,17 +1,22 @@
 <template>
-    <el-contaiemr>
-        <TableContainer />
-        
-    </el-contaiemr>
+    <el-row>
+        <ProductTable />
+        <FooterContainer />
+    </el-row>
 </template>
   
 <script>
-import TableContainer from '@/components/Table.vue'
+import ProductTable from '@/components/ProductTable.vue'
+import FooterContainer from '@/components/Footer.vue';
   
 export default {
     name: 'HomePage',
     components: {
-        TableContainer,
+        ProductTable,
+        FooterContainer
+    },
+    mounted() {
+        this.$store.dispatch('fetchProducts', {category: []})
     }
 }
 </script>
