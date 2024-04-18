@@ -52,7 +52,7 @@ export default {
     },
     methods: {
         handleMove(val) {
-            this.$store.dispatch('fetchProducts', {skip: val})
+            this.$store.dispatch('fetchNextProducts', {skip: val})
         },
         handleLimitChange(limit) {
             this.$store.dispatch('setLimit', limit)
