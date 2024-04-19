@@ -1,20 +1,26 @@
 <template>
     <el-row>
+
         <el-row type="flex" justify="end" :gutter="10">
-            <el-col :span="4" v-if="$route.path === '/'">
-                <el-select v-model="selectedCategories" @change="handleCategoryChange" multiple collapse-tags style="margin-left: 20px;" placeholder="Filter">
+            <!-- Category filter box -->
+            <el-col :span="4" v-if="$route.path === '/dashboard'">
+                <el-select v-model="selectedCategories" @change="handleCategoryChange" multiple collapse-tags
+                    style="margin-left: 20px;" placeholder="Filter">
                     <el-option v-for="item in allCategories" :key="item" :label="item" :value="item">
                     </el-option>
                 </el-select>
             </el-col>
+
+            <!-- Product search box -->
             <el-col :span="4" style="float: right;margin-bottom: 1em;">
                 <el-input placeholder="Search Product" v-model="input" clearable style="width: 15em">
                 </el-input>
             </el-col>
+
         </el-row>
 
-        <el-table v-loading="isLoading" :data="tableData" stripe height="510" style="width: 100%;" class="custom-table"
-            @row-click="handleClick">
+        <!-- Product Listing Table -->
+        <el-table v-loading="isLoading" :data="tableData" stripe height="510" style="width: 100%;" class="custom-table">
             <!-- For the image column -->
             <el-table-column label="Image">
                 <template slot-scope="scope">
@@ -28,18 +34,34 @@
                     :prop="field" :label="field" fit>
                 </el-table-column>
             </div>
+
+            <el-table-column label="Operations">
+                <template slot-scope="scope">
+                    <el-tooltip content="View Product" placement="top">
+                        <el-button size="mini" type="info" title="View Product" icon="el-icon-view" @click="handleViewProduct(scope.row)"></el-button>
+                    </el-tooltip>
+                    <router-link to="/edit-product">
+                        <el-button size="mini" @click="handleEditProduct(scope.row)">Edit</el-button>
+                    </router-link>
+                </template>
+            </el-table-column>
         </el-table>
     </el-row>
 </template>
 
 <script>
+
+
 export default {
     name: 'ProductTable',
     data() {
         return {
             input: '',
             debounceTimer: null,
-            selectedCategories: [] // TO store the categories selected from the filter option
+            selectedCategories: [], // TO store the categories selected from the filter option
+            form: [],
+            fileList: [],
+            dialogFormVisible: false,
         }
     },
     computed: {
@@ -54,6 +76,9 @@ export default {
         },
         allCategories() {
             return this.$store.getters.getAllCategories;
+        },
+        isFormVisible() {
+            return this.$store.getters.getFormVisibleStatus;
         }
 
     },
@@ -64,6 +89,9 @@ export default {
             this.debounceTimer = setTimeout(()=> {
                 this.fetchProducts(newValue);
             }, 500)
+        },
+        isFormVisible(newValue) {
+            this.dialogFormVisible = newValue
         }
     },
     methods: {
@@ -73,11 +101,11 @@ export default {
             else 
                 this.$store.dispatch('searchProducts', searchValue)
         },
-        handleClick(value) {
+        handleViewProduct(value) {
             this.$store.dispatch('fetchSingleProduct', value.id)
             const currentRoute = this.$router.currentRoute
 
-            if(currentRoute.path === '/') {
+            if(currentRoute.path === '/dashboard') {
                 this.$router.push({ path: `/all-products/${value.id}` });
             }
             else if(currentRoute.path.startsWith('/categories/')) {
@@ -88,6 +116,9 @@ export default {
         },
         handleCategoryChange() {
             this.$store.dispatch('fetchProducts', {category: this.selectedCategories})
+        },
+        handleEditProduct(value) {
+            this.$store.dispatch('setFormData', value)
         }
     },
 }

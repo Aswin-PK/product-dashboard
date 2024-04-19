@@ -15,6 +15,9 @@ export const store = new Vuex.Store({
         limit: 10,
         loading: false,
         singleProduct: null,
+        isFormVisible: false,
+        formData: {},
+        productUpdateStatus: null
     },
     mutations: {
         SET_PRODUCTS(state, productItems) {
@@ -38,6 +41,32 @@ export const store = new Vuex.Store({
         },
         SET_LIMITED_PRODUCTS(state, getLimitedProducts) {
             state.limitedProducts = getLimitedProducts
+        },
+        ADD_PRODUCT(state, productObject) {
+            const newProduct = {...productObject}
+            console.log("new Product", newProduct)
+            state.products.unshift({...productObject})
+        },
+        SET_FORM_VISIBILITY(state, isFormVisible) {
+            state.isFormVisible = isFormVisible
+        },
+
+        SET_FORM_DATA(state, productObject) {
+            state.formData = productObject
+        },
+
+        UPDATE_PRODUCT(state, productDetails) {
+            state.products.map(product => {
+                if(product.id === productDetails.id) {
+                    Object.keys(product).forEach(key => {
+                        product[key] = productDetails[key];
+                    });
+                }
+            })
+        },
+
+        SET_RESPONSE_STATUS(state, statusCode) {
+            state.productUpdateStatus = statusCode
         }
     },
     actions: {
@@ -96,7 +125,7 @@ export const store = new Vuex.Store({
                 let filteredProducts = state.products.filter(product => {
                     return product.title.toLowerCase().includes(searchInput.toLowerCase())
                 })
-                commit('SET_PRODUCTS', filteredProducts)
+                commit('SET_LIMITED_PRODUCTS', filteredProducts)
             }
             else {
                 try {
@@ -137,6 +166,63 @@ export const store = new Vuex.Store({
                 const limitedProducts = state.products.slice((skipValue-1)*state.limit, skipValue*state.limit);
                 commit('SET_LIMITED_PRODUCTS', limitedProducts);
             }
+        },
+
+        async addProduct({commit}, formData) {
+            commit('SET_RESPONSE_STATUS', null) // reset the status code to null
+            console.log(formData)
+            const response = await fetch('https://dummyjson.com/products/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: formData.title,
+                    description: formData.description,
+                    price: formData.price,
+                    rating: formData.rating,
+                    stock: formData.stock,
+                    brand: formData.brand,
+                    category: formData.category,
+                    /* other product data */
+                })
+            });
+            if(response.status === 200){
+                commit('SET_RESPONSE_STATUS', response.status)
+                commit('ADD_PRODUCT', formData)
+            }
+            else
+                console.log("Something Went wrong")
+        },
+
+        async editProduct({commit}, formData) {
+            commit('SET_RESPONSE_STATUS', null) // reset the status code to null
+            const response = await fetch(`https://dummyjson.com/products/${formData.id}`, {
+                method: 'PUT', /* or PATCH */
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: formData.title,
+                    description: formData.description,
+                    price: formData.price,
+                    rating: formData.rating,
+                    stock: formData.stock,
+                    brand: formData.brand,
+                    category: formData.category
+                })
+            });
+            if(response.status === 200){
+                // console.log("Status", response)
+                commit('SET_RESPONSE_STATUS', response.status)
+                commit('UPDATE_PRODUCT', formData)
+            }
+            else
+                console.log("Something Went wrong")
+        },
+
+        setFormVisibleStatus({commit}, isVisible) {
+            commit('SET_FORM_VISIBILITY', isVisible)
+        },
+
+        setFormData({commit}, productDetails) {
+            commit('SET_FORM_DATA', productDetails)
         }
 
     },
@@ -164,5 +250,14 @@ export const store = new Vuex.Store({
         getSingleProduct(state) {
             return state.singleProduct
         },
+        getFormVisibleStatus(state) {
+            return state.isFormVisible;
+        },
+        getFormData(state) {
+            return state.formData;
+        },
+        getStatusCode(state) {
+            return state.productUpdateStatus
+        }
     }
 })
