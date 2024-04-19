@@ -23,7 +23,7 @@ export default {
     methods: {
         handleCategory(category) {
             this.$store.dispatch('fetchProducts', {category: [category]});
-            this.$router.push({path: `/categories/${category}`})
+            this.$router.push({path: `/dashboard/categories/${category}`})
         }
     },
 }

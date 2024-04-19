@@ -38,7 +38,7 @@
             <el-table-column label="Operations">
                 <template slot-scope="scope">
                     <el-tooltip content="View Product" placement="top">
-                        <el-button size="mini" type="info" title="View Product" icon="el-icon-view" @click="handleViewProduct(scope.row)"></el-button>
+                        <el-button size="mini" type="info" icon="el-icon-view" @click="handleViewProduct(scope.row)"></el-button>
                     </el-tooltip>
                     <router-link to="/edit-product">
                         <el-button size="mini" @click="handleEditProduct(scope.row)">Edit</el-button>
@@ -104,6 +104,7 @@ export default {
         handleViewProduct(value) {
             this.$store.dispatch('fetchSingleProduct', value.id)
             const currentRoute = this.$router.currentRoute
+            console.log("value: ", currentRoute)
 
             if(currentRoute.path === '/dashboard') {
                 this.$router.push({ path: `/all-products/${value.id}` });

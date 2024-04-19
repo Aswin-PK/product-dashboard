@@ -6,12 +6,12 @@
                     <i class="el-icon-goods"></i>
                     <span>All Products</span>
                 </template>
-                <router-link to="/add-product">
+                <router-link to="/dashboard/add-product">
                     <el-menu-item index="0-1" @click="allProduct">Add product</el-menu-item>
                 </router-link>
             </el-submenu>
         </router-link>
-        <router-link to="/categories">
+        <router-link to="/dashboard/categories">
             <el-menu-item index="1">
                 <i class="el-icon-tickets"></i>
                 <span>Categories</span>
