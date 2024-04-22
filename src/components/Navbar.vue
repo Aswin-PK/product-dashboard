@@ -1,17 +1,34 @@
 <template>
-    <div class="logo-container">
-        <span><img src="../assets/logo.png" alt=""></span>
-        <h1>Product-Dashboard</h1>
-    </div>
+    <el-container>
+        <div class="logo-container">
+            <span><img src="../assets/logo.png" alt=""></span>
+            <h1>Product-Dashboard</h1>
+        </div>
+        <div class="demo-fit">
+            <div class="block">
+                <el-avatar shape="circle" fit="cover" :src="userDetails.image"></el-avatar>
+            </div>
+            <span>{{ userDetails.name }}</span>
+        </div>
+    </el-container>
 </template>
 
 <script>
 export default {
     name: 'NavBar',
+    props: {
+        userDetails: Object,
+    }
 }
 </script>
 
-<style>
+<style scoped>
+.el-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 .logo-container {
     height: 100%;
     display: flex;
@@ -29,5 +46,11 @@ export default {
     object-fit: cover;
     border-radius: 50%;
     cursor: pointer;
+}
+.demo-fit, .block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
 }
 </style>

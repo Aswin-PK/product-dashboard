@@ -17,7 +17,9 @@ export const store = new Vuex.Store({
         singleProduct: null,
         isFormVisible: false,
         formData: {},
-        productUpdateStatus: null
+        productUpdateStatus: null,
+        authToken: null,
+        authUserDetails: {},
     },
     mutations: {
         SET_PRODUCTS(state, productItems) {
@@ -67,7 +69,15 @@ export const store = new Vuex.Store({
 
         SET_RESPONSE_STATUS(state, statusCode) {
             state.productUpdateStatus = statusCode
-        }
+        },
+
+        SET_AUTH_TOKEN(state, authToken) {
+            state.authToken = authToken
+        },
+        SET_AUTH_USER(state, userDetails) {
+            state.authUserDetails = userDetails
+            console.log('userDetails', state.authUserDetails)
+        },
     },
     actions: {
         async fetchProducts({commit, state}, {category=state.selectedCategory, limit=state.limit, skip=0}) {
@@ -223,7 +233,30 @@ export const store = new Vuex.Store({
 
         setFormData({commit}, productDetails) {
             commit('SET_FORM_DATA', productDetails)
-        }
+        },
+
+
+        // User Login
+        async authenticateUser({commit}, userCredentials) {
+            console.log("user details", userCredentials)
+            const response = await fetch('https://dummyjson.com/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  username: userCredentials.username,
+                  password: userCredentials.password,
+                  expiresInMins: 30, // optional, defaults to 60
+                })
+            })
+
+            if(response.status === 200) {
+                const data = await response.json()
+                console.log("Success Response", data)
+                localStorage.setItem('token', data.token);
+                commit('SET_AUTH_TOKEN', data.token)
+                commit('SET_AUTH_USER', data)
+            }
+        },
 
     },
     getters: {
@@ -258,6 +291,12 @@ export const store = new Vuex.Store({
         },
         getStatusCode(state) {
             return state.productUpdateStatus
+        },
+        getAuthToken(state) {
+            return state.authToken;
+        },
+        getAuthUser(state) {
+            return state.authUserDetails;
         }
     }
 })

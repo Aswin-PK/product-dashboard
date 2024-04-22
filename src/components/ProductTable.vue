@@ -40,7 +40,7 @@
                     <el-tooltip content="View Product" placement="top">
                         <el-button size="mini" type="info" icon="el-icon-view" @click="handleViewProduct(scope.row)"></el-button>
                     </el-tooltip>
-                    <router-link to="/edit-product">
+                    <router-link to="/dashboard/edit-product">
                         <el-button size="mini" @click="handleEditProduct(scope.row)">Edit</el-button>
                     </router-link>
                 </template>
@@ -106,13 +106,13 @@ export default {
             const currentRoute = this.$router.currentRoute
             console.log("value: ", currentRoute)
 
-            if(currentRoute.path === '/dashboard') {
-                this.$router.push({ path: `/all-products/${value.id}` });
+            if(currentRoute.path.includes('/all-products')) {
+                this.$router.push({ path: `/dashboard/all-products/${value.id}` });
             }
-            else if(currentRoute.path.startsWith('/categories/')) {
+            else if(currentRoute.path.includes('/categories/')) {
                 const category = currentRoute.params.category;
                 console.log("At table", category, value.id)
-                this.$router.push({ path: `/categories/${category}/${value.id}` });
+                this.$router.push({ path: `/dashboard/categories/${category}/${value.id}` });
             }
         },
         handleCategoryChange() {

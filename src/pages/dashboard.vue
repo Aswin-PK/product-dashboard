@@ -1,7 +1,7 @@
 <template>
     <el-container>
         <el-header>
-            <NavBar />
+            <NavBar :userDetails="userDetails" />
         </el-header>
 
         <el-container>
@@ -37,8 +37,13 @@ export default {
         NavBar,
         SideBar,
     },
+    computed: {
+        userDetails() {
+            return this.$store.getters.getAuthUser;
+        }
+    },
 }
 </script>
 
-<style scoped>
+<style>
 </style>
