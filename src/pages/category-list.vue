@@ -1,6 +1,6 @@
 <template>
     <el-container>
-        <CategoryList :tableData="getCategories" />
+        <CategoryList />
     </el-container>
 </template>
 
