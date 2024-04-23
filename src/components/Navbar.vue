@@ -5,10 +5,10 @@
             <h1>Product-Dashboard</h1>
         </div>
         <div class="demo-fit">
+            <span>{{ userDetails.username }}</span>
             <div class="block">
                 <el-avatar shape="circle" fit="cover" :src="userDetails.image"></el-avatar>
             </div>
-            <span>{{ userDetails.name }}</span>
         </div>
     </el-container>
 </template>
@@ -46,6 +46,9 @@ export default {
     object-fit: cover;
     border-radius: 50%;
     cursor: pointer;
+}
+.demo-fit {
+    width: auto;
 }
 .demo-fit, .block {
     display: flex;

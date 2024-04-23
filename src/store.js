@@ -18,8 +18,8 @@ export const store = new Vuex.Store({
         isFormVisible: false,
         formData: {},
         productUpdateStatus: null,
-        authToken: null,
         authUserDetails: {},
+        authLoading: false,
     },
     mutations: {
         SET_PRODUCTS(state, productItems) {
@@ -46,8 +46,7 @@ export const store = new Vuex.Store({
         },
         ADD_PRODUCT(state, productObject) {
             const newProduct = {...productObject}
-            console.log("new Product", newProduct)
-            state.products.unshift({...productObject})
+            state.products.unshift(newProduct)
         },
         SET_FORM_VISIBILITY(state, isFormVisible) {
             state.isFormVisible = isFormVisible
@@ -72,11 +71,15 @@ export const store = new Vuex.Store({
         },
 
         SET_AUTH_TOKEN(state, authToken) {
-            state.authToken = authToken
+            localStorage.setItem('token', authToken);
         },
+        REMOVE_AUTH_TOKEN(state) {
+            localStorage.removeItem('token')
+            state.authUserDetails = {}
+        },
+
         SET_AUTH_USER(state, userDetails) {
             state.authUserDetails = userDetails
-            console.log('userDetails', state.authUserDetails)
         },
     },
     actions: {
@@ -180,7 +183,6 @@ export const store = new Vuex.Store({
 
         async addProduct({commit}, formData) {
             commit('SET_RESPONSE_STATUS', null) // reset the status code to null
-            console.log(formData)
             const response = await fetch('https://dummyjson.com/products/add', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -192,7 +194,6 @@ export const store = new Vuex.Store({
                     stock: formData.stock,
                     brand: formData.brand,
                     category: formData.category,
-                    /* other product data */
                 })
             });
             if(response.status === 200){
@@ -219,7 +220,6 @@ export const store = new Vuex.Store({
                 })
             });
             if(response.status === 200){
-                // console.log("Status", response)
                 commit('SET_RESPONSE_STATUS', response.status)
                 commit('UPDATE_PRODUCT', formData)
             }
@@ -227,44 +227,68 @@ export const store = new Vuex.Store({
                 console.log("Something Went wrong")
         },
 
-        setFormVisibleStatus({commit}, isVisible) {
-            commit('SET_FORM_VISIBILITY', isVisible)
-        },
-
         setFormData({commit}, productDetails) {
             commit('SET_FORM_DATA', productDetails)
         },
 
 
-        // User Login
-        async authenticateUser({commit}, userCredentials) {
-            console.log("user details", userCredentials)
+        // USER LOGIN --------
+        async authenticateUser({commit, state}, userCredentials) {
+            state.authLoading = true // setting loading animation while authenticating user
             const response = await fetch('https://dummyjson.com/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   username: userCredentials.username,
                   password: userCredentials.password,
-                  expiresInMins: 30, // optional, defaults to 60
+                  expiresInMins: 5, // optional, defaults to 60
                 })
             })
 
             if(response.status === 200) {
                 const data = await response.json()
-                console.log("Success Response", data)
-                localStorage.setItem('token', data.token);
-                commit('SET_AUTH_TOKEN', data.token)
+                const token = await data.token
+                commit('SET_AUTH_TOKEN', token)
                 commit('SET_AUTH_USER', data)
             }
+            
+            state.authLoading = false
+            return response.status;
         },
+
+        async getCurrentAuthUser({commit}) {
+            const token = localStorage.getItem('token');
+            if(token) {
+                const response = await fetch('https://dummyjson.com/auth/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if(response.status === 200) {
+                    const data = await response.json()
+                    commit('SET_AUTH_USER', data)
+                }
+                else {
+                    commit('REMOVE_AUTH_TOKEN')
+                }
+            }
+        },
+
+        async logoutUser({commit}) {
+            commit('REMOVE_AUTH_TOKEN')
+        }
 
     },
     getters: {
         getAllProducts(state) {
             if(state.selectedCategory.length === 0) {
+                // If no category is selected, return the array of fetched products
                 return state.products;
             }
             else {
+                // If a category is selected, return the arrayn of products that is manually filtered by limit from original products array
                 return state.limitedProducts;
             }
         },
@@ -278,13 +302,11 @@ export const store = new Vuex.Store({
             return {limit: state.limit, total: state.totalItems};
         },
         getLoading(state) {
+            // This is for showing loading animation while fetching products
             return state.loading
         },
         getSingleProduct(state) {
             return state.singleProduct
-        },
-        getFormVisibleStatus(state) {
-            return state.isFormVisible;
         },
         getFormData(state) {
             return state.formData;
@@ -292,11 +314,12 @@ export const store = new Vuex.Store({
         getStatusCode(state) {
             return state.productUpdateStatus
         },
-        getAuthToken(state) {
-            return state.authToken;
-        },
         getAuthUser(state) {
             return state.authUserDetails;
+        },
+        getAuthLoading(state) {
+            // This loading is to show while user authentication is happening while logging in
+            return state.authLoading;
         }
     }
 })

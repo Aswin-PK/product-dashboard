@@ -5,7 +5,7 @@
         </el-header>
 
         <el-container>
-            <el-aside width="160px">
+            <el-aside width="170px">
                 <SideBar />
             </el-aside>
 
