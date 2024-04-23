@@ -61,7 +61,6 @@ export default {
             selectedCategories: [], // TO store the categories selected from the filter option
             form: [],
             fileList: [],
-            dialogFormVisible: false,
         }
     },
     computed: {
@@ -77,9 +76,6 @@ export default {
         allCategories() {
             return this.$store.getters.getAllCategories;
         },
-        isFormVisible() {
-            return this.$store.getters.getFormVisibleStatus;
-        }
 
     },
     watch: {
@@ -90,9 +86,6 @@ export default {
                 this.fetchProducts(newValue);
             }, 500)
         },
-        isFormVisible(newValue) {
-            this.dialogFormVisible = newValue
-        }
     },
     methods: {
         fetchProducts(searchValue) {
@@ -104,14 +97,12 @@ export default {
         handleViewProduct(value) {
             this.$store.dispatch('fetchSingleProduct', value.id)
             const currentRoute = this.$router.currentRoute
-            console.log("value: ", currentRoute)
 
             if(currentRoute.path.includes('/all-products')) {
                 this.$router.push({ path: `/dashboard/all-products/${value.id}` });
             }
             else if(currentRoute.path.includes('/categories/')) {
                 const category = currentRoute.params.category;
-                console.log("At table", category, value.id)
                 this.$router.push({ path: `/dashboard/categories/${category}/${value.id}` });
             }
         },

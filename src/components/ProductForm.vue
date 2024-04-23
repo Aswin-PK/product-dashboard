@@ -6,11 +6,11 @@
                 <span style="font-size: 1.6em;">Product Details</span>
             </el-row>
             <el-row type="flex" style="gap: 1em">
-                <el-input v-model="formData.title" autocomplete="off" placeholder="title"></el-input>
+                <el-input v-model="formData.title" autocomplete="off" placeholder="Product name"></el-input>
                 <el-input v-model="formData.brand" autocomplete="off" placeholder="brand"></el-input>
                 <el-input v-model="formData.category" autocomplete="off" placeholder="category"></el-input>
             </el-row>
-            <el-input type="textarea" v-model="formData.description" placeholder="desciption"></el-input>
+            <el-input type="textarea" v-model="formData.description" placeholder="Something about the product..."></el-input>
             <el-row type="flex" style="gap: 1em">
                 <el-input v-model="formData.price" autocomplete="off" placeholder="price"></el-input>
                 <el-input v-model="formData.rating" autocomplete="off" placeholder="rating"></el-input>
@@ -85,9 +85,6 @@ export default {
         },
         handleRemove() {
             console.log("Reached here")  
-        },
-        handleFormVisibility(status) {
-            this.$store.dispatch('setFormVisibleStatus', status)
         },
         clearForm() {
             this.$store.dispatch('setFormData', [])
