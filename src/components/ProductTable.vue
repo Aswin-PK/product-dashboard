@@ -3,7 +3,7 @@
 
         <el-row type="flex" justify="end" :gutter="10">
             <!-- Category filter box -->
-            <el-col :span="4" v-if="$route.path === '/dashboard'">
+            <el-col :span="4" v-if="$route.path === '/dashboard/all-products'">
                 <el-select v-model="selectedCategories" @change="handleCategoryChange" multiple collapse-tags
                     style="margin-left: 20px;" placeholder="Filter">
                     <el-option v-for="item in allCategories" :key="item" :label="item" :value="item">
