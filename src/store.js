@@ -15,7 +15,6 @@ export const store = new Vuex.Store({
         limit: 10,
         loading: false,
         singleProduct: null,
-        isFormVisible: false,
         formData: {},
         productUpdateStatus: null,
         authUserDetails: {},
@@ -48,9 +47,6 @@ export const store = new Vuex.Store({
             const newProduct = {...productObject}
             state.products.unshift(newProduct)
         },
-        SET_FORM_VISIBILITY(state, isFormVisible) {
-            state.isFormVisible = isFormVisible
-        },
 
         SET_FORM_DATA(state, productObject) {
             state.formData = productObject
@@ -63,7 +59,7 @@ export const store = new Vuex.Store({
                         product[key] = productDetails[key];
                     });
                 }
-            })
+            });
         },
 
         SET_RESPONSE_STATUS(state, statusCode) {

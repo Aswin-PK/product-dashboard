@@ -80,12 +80,12 @@ export default {
                 }
             }
         },
-        handlePreview() {
-            console.log("Reached here")  
-        },
-        handleRemove() {
-            console.log("Reached here")  
-        },
+        // handlePreview() {
+        //     console.log("Reached here")  
+        // },
+        // handleRemove() {
+        //     console.log("Reached here")  
+        // },
         clearForm() {
             this.$store.dispatch('setFormData', [])
         },

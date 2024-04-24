@@ -40,7 +40,7 @@ export default {
                 ],
                 password: [
                     { required: true, message: 'Please enter your password', trigger: 'blur'},
-                    { min: 7, max: 15, message: 'Length should be 7 to 15', trigger: 'blur' }, 
+                    // { min: 7, max: 15, message: 'Length should be 7 to 15', trigger: 'blur' }, 
                 ],
             },
             showInvalidMessage: false,
