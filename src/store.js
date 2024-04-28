@@ -19,6 +19,8 @@ export const store = new Vuex.Store({
         productUpdateStatus: null,
         authUserDetails: {},
         authLoading: false,
+        sessionTime: 5, // in minutes
+        isSessionExpired: false,
     },
     mutations: {
         SET_PRODUCTS(state, productItems) {
@@ -77,6 +79,12 @@ export const store = new Vuex.Store({
         SET_AUTH_USER(state, userDetails) {
             state.authUserDetails = userDetails
         },
+
+        SESSION_EXPIRED(state, status) {
+            state.isSessionExpired = status
+        }
+
+
     },
     actions: {
         async fetchProducts({commit, state}, {category=state.selectedCategory, limit=state.limit, skip=0}) {
@@ -237,7 +245,7 @@ export const store = new Vuex.Store({
                 body: JSON.stringify({
                   username: userCredentials.username,
                   password: userCredentials.password,
-                  expiresInMins: 5, // optional, defaults to 60
+                  expiresInMins: state.sessionTime, // optional, defaults to 60
                 })
             })
 
@@ -246,6 +254,8 @@ export const store = new Vuex.Store({
                 const token = await data.token
                 commit('SET_AUTH_TOKEN', token)
                 commit('SET_AUTH_USER', data)
+
+                this.dispatch('handleSession')
             }
             
             state.authLoading = false
@@ -272,9 +282,50 @@ export const store = new Vuex.Store({
             }
         },
 
-        async logoutUser({commit}) {
+
+        handleSession({commit, state}) {
+            const timeout = (state.sessionTime-0.5)*1000*60 // -0.5 indicate that the session extend dialog box will be visible 30 seconds earlier
+                                                            // This is to get the valid token before it actally get expired, so that we can use it to refresh it
+            console.log("Timeout", timeout)
+            setTimeout(()=> {
+                commit('SESSION_EXPIRED', true)
+            }, timeout);
+        },
+        
+        async extendSession({commit, state}) {
+            const token = String(localStorage.getItem('token'));
+            console.log("Token", token)
+            try {
+                const response = await fetch('https://dummyjson.com/auth/refresh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        expiresInMins: state.sessionTime,
+                    })
+                });
+                if(response.status === 200) {
+                    const data = await response.json()
+                    const token = await data.token
+                    commit('SET_AUTH_TOKEN', token)
+                    commit('SET_AUTH_USER', data)
+                    
+                    this.dispatch('handleSession')
+                }
+            }
+            catch(error) {
+                console.log("Error", error)
+            }
+        },
+
+        logoutUser({commit}) {
             commit('REMOVE_AUTH_TOKEN')
-        }
+            commit('SESSION_EXPIRED', false)
+            return true
+        },
+
 
     },
     getters: {
@@ -316,6 +367,9 @@ export const store = new Vuex.Store({
         getAuthLoading(state) {
             // This loading is to show while user authentication is happening while logging in
             return state.authLoading;
+        },
+        getSessionStatus(state) {
+            return state.isSessionExpired;
         }
     }
 })

@@ -35,9 +35,11 @@ export default {
             this.$store.dispatch('setFormData', [])
         },
         async handleLogout() {
-            await this.$store.dispatch('logoutUser')
-            this.logoutMessage()
-            this.$router.push({path: '/login'})
+            const response = await this.$store.dispatch('logoutUser')
+            if(response) {
+                this.logoutMessage()
+                this.$router.push({path: '/login'})
+            }
         },
         logoutMessage() {
             this.$message('You have been logged out.');
