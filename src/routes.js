@@ -1,4 +1,3 @@
-// import HomePage from './pages/home.vue'
 import ProductDetails from './pages/product-details.vue'
 import CategoryListPage from './pages/category-list.vue'
 import CategoryProductsPage from './pages/category-products.vue'
@@ -9,11 +8,11 @@ import HomePage from './pages/home.vue'
 
 
 export const Routes = [
-    { path: '/', redirect: '/dashboard' },
     { path: '/login', component: LoginPage },
+    { path: '/', redirect: '/dashboard' },
     { path: '/dashboard', component: DashboardPage, meta: { requiresAuth: true },
         children: [
-            { path: '', redirect: 'all-products' },
+            { path: '', redirect: '/dashboard/all-products' },
             { path: 'all-products', component: HomePage, meta: { requiresAuth: true }},
             { path: 'all-products/:id', component: ProductDetails, meta: { requiresAuth: true } },
             { path: 'categories', component: CategoryListPage, meta: { requiresAuth: true }},       

@@ -1,10 +1,7 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
 import axios from 'axios'
+import { createStore } from 'vuex'
 
-Vue.use(Vuex);
-
-export const store = new Vuex.Store({
+export const store = createStore({
     state: {
         products: [],
         limitedProducts: [], // this is for storing limited products when user selects some categories of product
@@ -83,7 +80,6 @@ export const store = new Vuex.Store({
         SESSION_EXPIRED(state, status) {
             state.isSessionExpired = status
         }
-
 
     },
     actions: {
@@ -286,7 +282,7 @@ export const store = new Vuex.Store({
         handleSession({commit, state}) {
             const timeout = (state.sessionTime-0.5)*1000*60 // -0.5 indicate that the session extend dialog box will be visible 30 seconds earlier
                                                             // This is to get the valid token before it actally get expired, so that we can use it to refresh it
-            console.log("Timeout", timeout)
+            console.log("Timeout Called", timeout)
             setTimeout(()=> {
                 commit('SESSION_EXPIRED', true)
             }, timeout);

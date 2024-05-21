@@ -1,16 +1,28 @@
-import Vue from 'vue'
-import App from './App.vue'
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css';
+import { createApp } from 'vue';
 import { store } from './store'
-import VueRouter from 'vue-router';
 import { Routes } from './routes'
+import { createRouter, createWebHistory } from 'vue-router';
+import App from './App.vue'
 
-Vue.config.productionTip = false
+import ElementPlus from 'element-plus'
+import 'element-plus/theme-chalk/index.css'
+import '@vue/compat'
+// import { configureCompat } from 'vue'
 
-const router = new VueRouter({
-  routes: Routes,
-  mode: 'history'
+// configureCompat({
+//   COMPONENT_V_MODEL: false,
+//   WATCH_ARRAY: false,
+//   TRANSITION_GROUP_ROOT: false,
+//   INSTANCE_ATTRS_CLASS_STYLE: false,
+//   ATTR_FALSE_VALUE: null,
+//   COMPONENT_ASYNC: false
+// })
+
+
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: Routes
 });
 
 router.beforeEach((to, from, next) => {
@@ -26,11 +38,10 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-Vue.use(ElementUI);
-Vue.use(VueRouter)
 
-new Vue({
-  render: h => h(App),
-  store,
-  router,
-}).$mount('#app')
+const app = createApp(App)
+app.use(ElementPlus)
+app.use(store)
+app.use(router)
+
+app.mount('#app')
