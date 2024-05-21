@@ -5,9 +5,9 @@
             <h1>Product-Dashboard</h1>
         </div>
         <div class="demo-fit">
-            <span>{{ userDetails.username }}</span>
+            <span>{{ props.userDetails.username }}</span>
             <div class="block">
-                <el-avatar shape="circle" fit="cover" :src="userDetails.image"></el-avatar>
+                <el-avatar shape="circle" fit="cover" :src="props.userDetails.image"></el-avatar>
             </div>
         </div>
     </el-container>
@@ -15,11 +15,15 @@
 
 <script>
 export default {
-    name: 'NavBar',
-    props: {
-        userDetails: Object,
-    }
+    name: 'NavBar'
 }
+</script>
+
+<script setup>
+import { defineProps } from 'vue'
+const props = defineProps({
+    userDetails: Object
+})
 </script>
 
 <style scoped>

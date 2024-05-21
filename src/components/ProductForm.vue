@@ -1,6 +1,6 @@
 <template>
     <div class="form-container" style="background-color: rgb(208 216 230);padding: 1em;">
-        <el-form ref="form" :model="formData" label-width="120px" @submit.native.prevent="handleProduct"
+        <el-form ref="form" :model="formData" label-width="120px" @submit.prevent="handleProduct"
         style="display: flex; flex-direction: column; gap: 1em">
             <el-row>
                 <span style="font-size: 1.6em;">Product Details</span>
@@ -35,69 +35,65 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: 'ProductForm',
-    data() {
-        return {
-            form: [],
-            dialogImageUrl: '',
-            dialogVisible: false,
-            responseStatusCode: null,
-        }
-    },
-    computed: {
-        formData() {
-            return this.$store.getters.getFormData;
-        },
-        statusCode() {
-            return this.$store.getters.getStatusCode;
-        }
-    },
-    watch: {
-        formData(newValue) {
-            this.form = newValue
-        },
-        statusCode(newValue) {
-            this.responseStatusCode = newValue
-        }
-    },
-    methods: {
-        async handleProduct() {
-            this.$store.dispatch('setFormVisibleStatus', false)
-            if(this.formData.id){
-                await this.$store.dispatch('editProduct', this.formData)
-                if(this.responseStatusCode == 200) {
-                    this.successMessage('updated');
-                    this.$router.push({path: '/'})
-                }
-            }
-            else {
-                await this.$store.dispatch('addProduct', this.form)
-                if(this.responseStatusCode == 200) {
-                    this.successMessage('added');
-                    this.$router.push({path: '/'})
-                }
-            }
-        },
-        // handlePreview() {
-        //     console.log("Reached here")  
-        // },
-        // handleRemove() {
-        //     console.log("Reached here")  
-        // },
-        clearForm() {
-            this.$store.dispatch('setFormData', [])
-        },
-        successMessage(text) {
-            this.$message({
-                showClose: true,
-                message: `Product details ${text} successfully`,
-                type: 'success'
-            });
-        },
+<script setup>
+import { ElMessage } from 'element-plus';
+import { computed, reactive, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
+const store = useStore();
+const router = useRouter();
+
+let form = reactive([]);
+// const dialogImageUrl = ref('');
+// const dialogVisible = ref(false)
+let responseStatusCode = ref()
+
+const formData = computed(() => store.getters.getFormData);
+const statusCode = computed(() => store.getters.getStatusCode);
+
+watch(
+    formData,
+    (newValue) => {
+        Object.assign(form, newValue);
+    },
+    { deep: true }
+)
+
+watch(
+    statusCode,
+    (newValue) => {
+        responseStatusCode.value = newValue
+    },
+    { deep: true }
+)
+
+const handleProduct = async() => {
+    if(formData.id){
+        await store.dispatch('editProduct', formData)
+        if(responseStatusCode.value == 200) {
+            successMessage('updated');
+            router.push({path: '/'})
+        }
     }
+    else {
+        await store.dispatch('addProduct', formData)
+        if(responseStatusCode.value == 200) {
+            successMessage('added');
+            router.push({path: '/'})
+        }
+    }
+}
+
+const clearForm = () => {
+    store.dispatch('setFormData', [])
+}
+const successMessage = (text) => {
+    ElMessage({
+        showClose: true,
+        message: `Product details ${text} successfully`,
+        type: 'success'
+    });
 }
 </script>
 

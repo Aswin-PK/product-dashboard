@@ -2,11 +2,11 @@
     <el-table :data="categories" stripe height="620">
         <!-- Render each category string value as a row -->
         <el-table-column label="Categories">
-            <template slot-scope="scope">
+            <template #default="scope">
                 <div class="row" @click="handleCategory(scope.row)">
                     <span>{{ scope.row }}</span>
                     <span>
-                        <i class="el-icon-d-arrow-right"></i>
+                        <el-icon><DArrowRight /></el-icon>
                     </span>
                 </div>
             </template>
@@ -14,20 +14,23 @@
     </el-table>
 </template>
 
-<script>
-export default {
-    name: 'CategoryList',
-    computed: {
-        categories() {
-            return this.$store.getters.getAllCategories;
-        },
-    },
-    methods: {
-        handleCategory(category) {
-            this.$store.dispatch('fetchProducts', {category: [category]});
-            this.$router.push({path: `/dashboard/categories/${category}`})
-        }
-    },
+<script setup>
+import { DArrowRight } from '@element-plus/icons-vue';
+
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+
+const store = useStore();
+const router = useRouter();
+
+const categories = computed(() => {
+    return store.getters.getAllCategories;
+})
+
+const handleCategory = (category) => {
+    store.dispatch('fetchProducts', {category: [category]});
+    router.push({path: `/dashboard/categories/${category}`})
 }
 </script>
 

@@ -1,27 +1,28 @@
 <template>
     <el-container>
-        <el-menu default-active="0" class="el-menu-vertical-demo">
-            <router-link to="/">
-                <el-submenu index="0">
-                    <template slot="title">
-                        <i class="el-icon-goods"></i>
+        <el-menu default-active="1" class="el-menu-vertical-demo" >
+            <router-link to="/" style="text-decoration: none">
+                <el-sub-menu index="1">
+                    <template #title>
+                        <el-icon><Menu /></el-icon>
                         <span>All Products</span>
                     </template>
-                    <router-link to="/dashboard/add-product">
-                        <el-menu-item index="0-1" @click="allProduct">Add product</el-menu-item>
+                    <router-link to="/dashboard/add-product" style="text-decoration: none">
+                        <el-menu-item index="1-1" @click="allProduct">
+                            <el-icon><EditPen /></el-icon>Add product</el-menu-item>
                     </router-link>
-                </el-submenu>
+                </el-sub-menu>
             </router-link>
-            <router-link to="/dashboard/categories">
-                <el-menu-item index="1">
-                    <i class="el-icon-tickets"></i>
+            <router-link to="/dashboard/categories" style="text-decoration: none">
+                <el-menu-item index="2">
+                    <el-icon><List /></el-icon>
                     <span>Categories</span>
                 </el-menu-item>
             </router-link>
         </el-menu>
         <el-menu>
             <el-menu-item class="logout-menu-item" @click="handleLogout">
-                <span style="color: red;">[<i class="el-icon-right" style="color: red;"></i>Logout</span>
+                <span style="color: red;">[<el-icon><Right /></el-icon>Logout</span>
             </el-menu-item>
         </el-menu>
     </el-container>
@@ -29,22 +30,32 @@
 
 <script>
 export default {
-    name: 'SideBar',
-    methods: {
-        allProduct() {
-            this.$store.dispatch('setFormData', [])
-        },
-        async handleLogout() {
-            const response = await this.$store.dispatch('logoutUser')
-            if(response) {
-                this.logoutMessage()
-                this.$router.push({path: '/login'})
-            }
-        },
-        logoutMessage() {
-            this.$message('You have been logged out.');
-        },
+    name: 'SideBar'
+}
+</script>
+
+<script setup>
+import { ElMessage } from 'element-plus'
+import { EditPen, List, Menu, Right } from '@element-plus/icons-vue'
+
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex';
+
+const router = useRouter();
+const store = useStore();
+
+const allProduct = () => {
+    store.dispatch('setFormData', [])
+}
+const handleLogout = async() => {
+    const response = await store.dispatch('logoutUser')
+    if(response) {
+        logoutMessage()
+        router.push({path: '/login'})
     }
+}
+const logoutMessage = () => {
+    ElMessage('You have been logged out.');
 }
 </script>
 

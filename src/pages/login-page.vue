@@ -1,89 +1,89 @@
 <template>
     <el-container>
-        <el-row>
-            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-ruleForm">
-                <div class="title">
-                    <span>Login</span>
-                </div>
-                <el-form-item label="Username" prop="username">
-                    <el-input ref="inputField" v-model="ruleForm.username"></el-input>
-                </el-form-item>
-                
-                <el-form-item label="Password" prop="password">
-                    <el-input type="password" v-model="ruleForm.password" show-password></el-input>
-                </el-form-item>
-                
-                <div v-if="showInvalidMessage" class="invalid-message" style="width: 100%; text-align: center;">
-                    <span style="color: red; ">Incorrect Username or Password.</span>
-                </div>
-                <el-form-item>
-                    <el-button type="primary" :loading="isLoading" @click="submitForm('ruleForm')">Login</el-button>
-                </el-form-item>
-            </el-form>
-        </el-row>
+      <el-row>
+        <el-form :model="ruleForm" :rules="rules" ref="ruleFormRef">
+          <div class="title">
+            <span>Login</span>
+          </div>
+          <el-form-item label="Username" prop="username">
+            <el-input ref="inputField" v-model="ruleForm.username"></el-input>
+          </el-form-item>
+  
+          <el-form-item label="Password" prop="password">
+            <el-input type="password" v-model="ruleForm.password" show-password />
+          </el-form-item>
+  
+          <div v-if="showInvalidMessage" class="invalid-message" style="width: 100%; text-align: center; color: red;">
+            <span>Incorrect Username or Password.</span>
+          </div>
+          <el-form-item>
+            <el-button type="primary" :loading="isLoading" @click="submitForm">Login</el-button>
+          </el-form-item>
+        </el-form>
+      </el-row>
     </el-container>
 </template>
+  
+<script setup>
+import { ref, reactive, computed } from 'vue';
+import { ElNotification, ElMessage } from 'element-plus';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
-<script>
-export default {
-    name: 'LoginPage',
-    data() {
-        return {
-            ruleForm: {
-                username: '',
-                password: '',
-            },
-            rules: {
-                username: [
-                    { required: true, message: 'Please enter your username', trigger: 'blur' },
-                    // { type: 'email', message: 'Please input correct email', trigger: ['blur', 'change'] }
-                ],
-                password: [
-                    { required: true, message: 'Please enter your password', trigger: 'blur'},
-                    // { min: 7, max: 15, message: 'Length should be 7 to 15', trigger: 'blur' }, 
-                ],
-            },
-            showInvalidMessage: false,
-        }
-    },
-    computed: {
-        isLoading() {
-            return this.$store.getters.getAuthLoading;
-        }
-    },
-    methods: {
-        submitForm(formName) {
-            this.$refs[formName].validate(async (valid) => {
-                if (valid) {
-                    const status = await this.$store.dispatch('authenticateUser', this.ruleForm)
-                    if(status === 200) {
-                        this.loginSuccessMessage();
-                        this.$router.push({ path: '/' })
-                        this.showInvalidMessage = false
-                    }
-                    else {
-                        this.showInvalidMessage = true
-                    }
-                } else {
-                    console.log('error submit!!');
-                    return false;
-                }
-            });
-        },
+const store = useStore();
+const router = useRouter();
 
-        // Success message
-        loginSuccessMessage() {
-            this.$notify({
-                title: 'Welcome Back !',
-                message: 'Login successful',
-                type: 'success'
-            });
-        },
-    },
-    mounted() {
-        this.$refs.inputField.focus();
-    },
-}
+const ruleFormRef = ref(null);
+const ruleForm = reactive({
+    username: '',
+    password: '',
+});
+const rules = reactive({
+    username: [
+        { required: true, message: 'Please enter your username', trigger: 'blur' },
+        // { type: 'email', message: 'Please input correct email', trigger: ['blur', 'change'] }
+    ],
+    password: [
+        { required: true, message: 'Please enter your password', trigger: 'blur' },
+        // { min: 7, max: 15, message: 'Length should be 7 to 15', trigger: 'blur' }, 
+    ],
+});
+
+const showInvalidMessage = ref(false);
+
+const isLoading = computed(() => store.getters.getAuthLoading);
+
+const submitForm = async () => {
+    ruleFormRef.value.validate(async (valid) => {
+        if (valid) {
+            const status = await store.dispatch('authenticateUser', ruleForm);
+            if (status === 200) {
+                console.log("Login success");
+                loginSuccessMessage();
+                router.push({ path: '/' });
+                showInvalidMessage.value = false;
+                // ElMessage.success("Submission Success");
+            } else {
+                showInvalidMessage.value = true;
+                // ElMessage.error("Incorrect Username or Password.");
+            }
+        } else {
+            ElMessage.error("Submission Failed");
+        }
+    });
+};
+
+const loginSuccessMessage = () => {
+    ElNotification({
+        title: 'Welcome Back!',
+        message: 'Login successful',
+        type: 'success'
+    });
+};
+
+// onMounted(() => {
+//     ruleFormRef.value.$refs.inputField.focus();
+// });
 </script>
 
 <style scoped>

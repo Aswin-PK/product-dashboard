@@ -20,36 +20,33 @@
                     <p>{{ product.description }}</p>
                 </el-row>
                 <el-row>
-                    <h2>Rs. {{ product.price }}</h2>
+                    <h2>Rs. {{ product.price*83 }}</h2>
                 </el-row>
             </el-col>
         </el-row>
     </el-container>
 </template>
 
-<script>
-export default {
-    name: 'ProductDetails',
-    data() {
-        return {
-            product: {},
-            loading: true,
+<script setup>
+import { computed, reactive, ref, watch } from 'vue';
+import { useStore } from 'vuex';
+
+const store = useStore();
+const product = reactive({});
+const loading = ref(true);
+
+const productDetails = computed(() => store.getters.getSingleProduct);
+  
+watch(
+    () => productDetails.value, 
+    (newValue) => {
+        if (newValue !== null) {
+            loading.value = false;
+            Object.assign(product, newValue);
         }
     },
-    computed: {
-        productDetails() {
-            return this.$store.getters.getSingleProduct;
-        },
-    },
-    watch: {
-        productDetails(newValue) {
-            if (newValue !== null) {
-                this.loading = false;
-                this.product = newValue
-            }
-        }
-    },
-}
+    { deep: true, immediate: true }
+)
 
 </script>
 

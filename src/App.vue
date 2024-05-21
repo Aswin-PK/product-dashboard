@@ -1,7 +1,7 @@
 <template>
   <el-container id="app">
     <template>
-      <el-dialog title="Your session has expired" :visible.sync="dialogVisible" width="25%" :before-close="handleClose">
+      <el-dialog title="Your session has expired" v-model="dialogVisible" width="25%" :before-close="handleClose">
         <!-- <span slot="footer" class="dialog-footer"> -->
           <el-button @click="handleClick('cancel')">Cancel</el-button>
           <el-button type="primary" @click="handleClick('extend')">Extend Session</el-button>
@@ -13,47 +13,73 @@
 </template>
 
 <script>
+// Stop error resizeObserver
+const debounce = (callback, delay) => {
+  let tid;
+  return function (...args) {
+    const ctx = this;
+    tid && clearTimeout(tid);
+    tid = setTimeout(() => {
+      callback.apply(ctx, args);
+    }, delay);
+  };
+};
+
+const _ = window.ResizeObserver;
+window.ResizeObserver = class ResizeObserver extends _ {
+  constructor(callback) {
+    callback = debounce(callback, 20);
+    super(callback);
+  }
+};
 
 export default {
-  name: 'App',
-  data() {
-    return { dialogVisible: false }
+  name: 'App'
+}
+
+</script>
+
+<script setup>
+import { computed, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+const store = useStore();
+const router = useRouter();
+const dialogVisible = ref(true)
+
+const isSessionExpired = computed(() => store.getters.getSessionStatus);
+
+watch(
+  () => isSessionExpired.value,
+  (newValue) => {
+    dialogVisible.value = newValue
   },
-  computed: {
-    isSessionExpired() {
-      return this.$store.getters.getSessionStatus;
-    }
-  },
-  watch: {
-    isSessionExpired(newValue) {
-      this.dialogVisible = newValue
-    }
-  },
-  mounted() {
-    this.$store.dispatch('fetchCategories'),
-    this.$store.dispatch('getCurrentAuthUser')
-  },
-  methods: {
+  { deep: true }
+)
+
+onMounted(() => {
+    store.dispatch('fetchCategories')
+    store.dispatch('getCurrentAuthUser')
+})
 
     // to disable the closing of the dialog box when clicked outside of that box
-    handleClose() {
-      return
-    },
+const handleClose = () => {
+  return
+}
 
     // To handle the button click in the dialog box
-    handleClick(clickedButton) {
-      if(clickedButton === 'cancel') { // if user didn't clicked the extend session button, the page will redirect to login
-        const response = this.$store.dispatch('logoutUser')
-        if(response) {
-          this.$router.push({ path: '/login' })
-        }
-      }
-      else {
-        this.$store.dispatch('extendSession')
-        this.$store.commit('SESSION_EXPIRED', false)
+const handleClick = (clickedButton) => {
+    if(clickedButton === 'cancel') { // if user didn't clicked the extend session button, the page will redirect to login
+      const response = store.dispatch('logoutUser')
+      if(response) {
+        router.push({ path: '/login' })
       }
     }
-  }
+    else {
+      store.dispatch('extendSession')
+      store.commit('SESSION_EXPIRED', false)
+    }
 }
 </script>
 

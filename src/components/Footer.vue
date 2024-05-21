@@ -9,58 +9,59 @@
             <span>Out of {{ displayItems.total }}</span>
         </span>
 
-        <el-pagination background layout="prev, pager, next" :total="(displayItems.total/displayItems.limit)*10" @current-change="handleMove">
-        </el-pagination>
+        <el-pagination background layout="prev, pager, next" :total="(displayItems.total/displayItems.limit)*10" @current-change="handleMove" />
     </el-container>
 </template>
 
 <script>
 export default {
-    name: 'FooterContainer',
-    data() {
-        return {
-            limitOptions: [],
-        }
-    },
-    computed: {
-        displayItems: {
-            get() {
-                return this.$store.getters.getDisplayLimit;
-            }
-        },
-        defaultLimit() {
-            return (this.displayItems.limit < this.displayItems.total) ? this.displayItems.limit : this.displayItems.total
-        },
-        total_pages() {
-            return (this.displayItems.total/this.selectedLimit)*10
-        }
-    },
-    watch: {
-        'displayItems.total': function(oldValue, newValue) {
-            if(oldValue !== newValue) {
-                this.limitOptions = []
-                let limit = this.displayItems.limit
-                const totalItems = this.displayItems.total;
-                while(limit < totalItems) {
-                    this.limitOptions.push(limit)
-                    limit += 10
-                }
-                if(this.defaultLimit !== totalItems)
-                    this.limitOptions.push(totalItems)
-            }
-        },
-    },
-    methods: {
-        handleMove(val) {
-            this.$store.dispatch('fetchNextProducts', {skip: val})
-        },
-        handleLimitChange(limit) {
-            this.$store.dispatch('setLimit', limit)
-            this.$store.dispatch('fetchProducts', {limit: limit})
-        }
-    },
-
+    name: 'SideBar'
 }
+</script>
+
+<script setup>
+import { computed, onMounted, ref, watch } from 'vue';
+import { useStore } from 'vuex';
+
+const store = useStore();
+
+let limitOptions = ref([]);
+
+const displayItems = computed(() => {
+    return store.getters.getDisplayLimit;
+})
+const defaultLimit = computed(() => {
+    return (displayItems.value.limit < displayItems.value.total) ? displayItems.value.limit : displayItems.value.total
+})
+watch(
+    () => displayItems.value.total,
+    (oldValue, newValue) => {
+        if(oldValue !== newValue) {
+            limitOptions.value = []
+            let limit = displayItems.value.limit
+            const totalItems = displayItems.value.total
+            while(limit < totalItems) {
+                limitOptions.value.push(limit)
+                limit += 10
+            }
+            if(defaultLimit !== totalItems)
+                limitOptions.value.push(totalItems)
+        }
+    },
+    { deep: true }
+)
+
+const handleMove = (val) => {
+    store.dispatch('fetchNextProducts', {skip: val})
+}
+const handleLimitChange = (limit) => {
+    store.dispatch('setLimit', limit)
+    store.dispatch('fetchProducts', {limit: limit})
+}
+
+onMounted(()=>{
+    console.log(displayItems.value)
+})
 </script>
 
 <style scoped>

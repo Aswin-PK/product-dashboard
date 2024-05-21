@@ -28,21 +28,21 @@
 </template>
 
 <script>
+export default {
+    name: 'DashBoard'
+}
+</script>
+
+<script setup>
 import NavBar from '@/components/Navbar.vue'
 import SideBar from '@/components/Sidebar.vue'
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 
-export default {
-    name: 'DashboardPage',
-    components: {
-        NavBar,
-        SideBar,
-    },
-    computed: {
-        userDetails() {
-            return this.$store.getters.getAuthUser;
-        }
-    },
-}
+const store = useStore();
+
+const userDetails = computed(() => store.getters.getAuthUser);
+
 </script>
 
 <style>
